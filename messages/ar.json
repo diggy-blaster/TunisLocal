@@ -36,5 +36,15 @@
     "title": "الإشعارات",
     "empty": "لا توجد إشعارات جديدة",
     "markRead": "تحديد الكل كمقروء"
+  }  "map": {
+    "locateMe": "استخدم موقعي الحالي",
+    "searchRadius": "نطاق البحث (كم)",
+    "loadingMap": "جاري تحميل الخريطة...",
+    "noLocation": "يرجى تفعيل خدمة الموقع",
+    "viewOnMap": "عرض على الخريطة"
+  },
+  "serviceCard": {
+    "distance": "على بعد {dist} كم",
+    "rating": "{rating} ({count} تقييم)"
   }
 }
