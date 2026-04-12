@@ -1,0 +1,40 @@
+{
+  "layout": {
+    "title": "TunisLocal",
+    "nav": { "home": "Home", "services": "Services", "bookings": "My Bookings", "reviews": "Reviews", "profile": "Profile" },
+    "theme": { "light": "Light", "dark": "Dark" }
+  },
+  "services": {
+    "title": "Find Nearby Services",
+    "searchPlaceholder": "Search by name or category...",
+    "filterCategory": "Category",
+    "radiusKm": "Radius (km)",
+    "loading": "Searching nearby services...",
+    "noResults": "No services found in this area.",
+    "viewDetails": "View Details",
+    "bookNow": "Book Now"
+  },
+  "reviews": {
+    "title": "Customer Reviews",
+    "writeReview": "Write a Review",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submit": "Submit Review",
+    "required": "Required",
+    "success": "Review submitted successfully!",
+    "alreadyReviewed": "You have already reviewed this booking."
+  },
+  "payments": {
+    "title": "Complete Payment",
+    "selectProvider": "Select Payment Method",
+    "confirmPay": "Pay {amount} TND",
+    "processing": "Processing...",
+    "success": "Payment successful",
+    "failed": "Payment failed. Please try again."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No new notifications",
+    "markRead": "Mark all as read"
+  }
+}
