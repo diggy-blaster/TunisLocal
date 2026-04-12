@@ -1,21 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ✅ React 18 Strict Mode (optional, can disable for dev)
   reactStrictMode: true,
 
-  // ✅ Allow CommonJS modules (for your geo.js, notifications.js, etc.)
-  serverComponentsExternalPackages: ['pg', 'crypto', 'expo-server-sdk'],
+  // ✅ Next.js ≥ 14.1: top-level key (not in experimental), no built-ins like 'crypto'
+  serverExternalPackages: ['pg', 'expo-server-sdk'],
 
-  // ✅ i18n configuration for next-intl (optional if using middleware-only routing)
-  i18n: {
-    locales: ['en', 'fr', 'ar'],
-    defaultLocale: 'en',
-    localeDetection: true,
-  },
+  // ✅ No i18n block — use next-intl middleware instead for App Router
 
-  // ✅ Webpack tweaks for native modules & Leaflet
   webpack: (config, { isServer }) => {
-    // Fix Leaflet default icon import in SSR
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -25,35 +17,41 @@ const nextConfig = {
       };
     }
 
-    // Handle pg-native optional dependency (not needed for node-postgres)
-    config.externals = [...(config.externals || []), 'pg-native'];
+    // ✅ Safe pg-native exclusion regardless of externals shape
+    if (Array.isArray(config.externals)) {
+      config.externals.push('pg-native');
+    } else {
+      const original = config.externals;
+      config.externals = async (ctx) => {
+        const base = typeof original === 'function' ? await original(ctx) : original;
+        return [...(Array.isArray(base) ? base : []), 'pg-native'];
+      };
+    }
 
     return config;
   },
 
-  // ✅ Output: standalone for Vercel serverless optimization
-  output: 'standalone',
-
-  // ✅ Compress static assets
+  // ✅ Remove output: 'standalone' for Vercel — only use for Docker/self-hosted
+  
   compress: true,
-
-  // ✅ Powered-by header removal (minor security)
   poweredByHeader: false,
 
-  // ✅ Image domains (if you use next/image with external URLs)
+  // ✅ remotePatterns only, no deprecated domains[]
   images: {
-    domains: ['unpkg.com', 'tile.openstreetmap.org'],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.tile.openstreetmap.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unpkg.com',
+      },
       {
         protocol: 'https',
         hostname: '**.vercel.app',
       },
     ],
-  },
-
-  // ✅ Experimental: optimize server components
-  experimental: {
-    serverComponentsExternalPackages: ['pg', 'crypto', 'expo-server-sdk'],
   },
 };
 
