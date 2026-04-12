@@ -36,5 +36,15 @@
     "title": "Notifications",
     "empty": "No new notifications",
     "markRead": "Mark all as read"
+  }  "map": {
+    "locateMe": "Use my location",
+    "searchRadius": "Search radius (km)",
+    "loadingMap": "Loading map...",
+    "noLocation": "Please enable location access",
+    "viewOnMap": "View on map"
+  },
+  "serviceCard": {
+    "distance": "{dist} km away",
+    "rating": "{rating} ({count} reviews)"
   }
 }
