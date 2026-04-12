@@ -1,77 +1,40 @@
-// api/payments/webhook/[provider].js
-// Receives callbacks from Flouci, D17, and online bank gateways.
-// Verifies signatures before updating payment status.
-
+// app/api/payments/webhook/[provider]/route.js
 import { handleWebhook } from '@/lib/payments';
 import crypto from 'crypto';
 
-// Disable body parsing — we need raw body for HMAC signature verification
-export const config = { api: { bodyParser: false } };
+export async function POST(req, { params }) {
+  const { provider } = params;
 
-async function getRawBody(req) {
-  return new Promise((resolve, reject) => {
-    let data = '';
-    req.on('data', (chunk) => (data += chunk));
-    req.on('end', () => resolve(data));
-    req.on('error', reject);
-  });
-}
-
-function verifyFlouciSignature(rawBody, signature) {
-  const expected = crypto
-    .createHmac('sha256', process.env.FLOUCI_APP_SECRET)
-    .update(rawBody)
-    .digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature || ''));
-}
-
-function verifyD17Signature(rawBody, signature) {
-  const expected = crypto
-    .createHmac('sha256', process.env.D17_API_KEY)
-    .update(rawBody)
-    .digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature || ''));
-}
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
-
-  const { provider } = req.query;
-  const rawBody      = await getRawBody(req);
+  // In App Router, get raw body like this:
+  const rawBody = await req.text();   // ← replaces getRawBody()
   let body;
 
   try {
     body = JSON.parse(rawBody);
   } catch {
-    return res.status(400).json({ error: 'Invalid JSON' });
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  // Signature verification per gateway
   if (provider === 'flouci') {
-    const sig = req.headers['x-flouci-signature'];
+    const sig = req.headers.get('x-flouci-signature');
     if (sig && !verifyFlouciSignature(rawBody, sig)) {
-      return res.status(401).json({ error: 'Invalid Flouci signature' });
+      return Response.json({ error: 'Invalid Flouci signature' }, { status: 401 });
     }
   }
 
   if (provider === 'd17') {
-    const sig = req.headers['x-d17-signature'];
+    const sig = req.headers.get('x-d17-signature');
     if (sig && !verifyD17Signature(rawBody, sig)) {
-      return res.status(401).json({ error: 'Invalid D17 signature' });
+      return Response.json({ error: 'Invalid D17 signature' }, { status: 401 });
     }
   }
 
-  // online_bank: no server-side signature in redirect flow;
-  // verification is done by querying bank status API (poll from success page)
-
   try {
     const payment = await handleWebhook(provider, body);
-    if (!payment) {
-      return res.status(404).json({ error: 'Payment not found' });
-    }
-    return res.status(200).json({ ok: true, status: payment.status });
+    if (!payment) return Response.json({ error: 'Payment not found' }, { status: 404 });
+    return Response.json({ ok: true, status: payment.status });
   } catch (err) {
     console.error(`Webhook error [${provider}]:`, err);
-    return res.status(500).json({ error: err.message });
+    return Response.json({ error: err.message }, { status: 500 });
   }
 }
