@@ -33,7 +33,17 @@
     "failed": "Échec du paiement. Veuillez réessayer."
   },
   "notifications": {
-    "title": "Notifications",
+    "title": "Notifications",  "map": {
+    "locateMe": "Utiliser ma position",
+    "searchRadius": "Rayon de recherche (km)",
+    "loadingMap": "Chargement de la carte...",
+    "noLocation": "Veuillez activer la géolocalisation",
+    "viewOnMap": "Voir sur la carte"
+  },
+  "serviceCard": {
+    "distance": "À {dist} km",
+    "rating": "{rating} ({count} avis)"
+  }
     "empty": "Aucune nouvelle notification",
     "markRead": "Tout marquer comme lu"
   }
