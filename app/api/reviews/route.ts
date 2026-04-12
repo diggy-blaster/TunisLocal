@@ -31,7 +31,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(req as any, {} as any, authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  }
 
   const body = await req.json();
   const { booking_id, rating, comment } = body;
@@ -40,6 +42,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'booking_id and rating (1-5) required' }, { status: 400 });
   }
 
-  // ... (copy your POST logic from index.js, adapt to NextResponse)
-  // Ensure you use pool.query and return NextResponse.json()
+  const { rows: bookings } = await pool.query(
+    `SELECT id, service_id, status, customer_id FROM bookings WHERE id = $1`,
+    [booking_id]
+  );
+
+  if (!bookings.length) return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+  const booking = bookings[0];
+
+  if (booking.customer_id !== session.user.id) {
+    return NextResponse.json({ error: 'Not your booking' }, { status: 403 });
+  }
+  if (booking.status !== 'completed') {
+    return NextResponse.json({ error: 'Reviews can only be submitted for completed bookings' }, { status: 422 });
+  }
+
+  const { rows: existing } = await pool.query(
+    `SELECT id FROM reviews WHERE booking_id = $1 AND reviewer_id = $2`,
+    [booking_id, session.user.id]
+  );
+  if (existing.length) {
+    return NextResponse.json({ error: 'You have already reviewed this booking' }, { status: 409 });
+  }
+
+  const { rows: inserted } = await pool.query(
+    `INSERT INTO reviews (service_id, booking_id, reviewer_id, rating, comment)
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [booking.service_id, booking_id, session.user.id, rating, comment || null]
+  );
+
+  const { rows: ratingRows } = await pool.query(
+    `SELECT avg_rating, review_count FROM service_ratings WHERE service_id = $1`,
+    [booking.service_id]
+  );
+
+  return NextResponse.json({
+    review: inserted[0],
+    service_rating: ratingRows[0] || { avg_rating: rating, review_count: 1 },
+  }, { status: 201 });
 }
