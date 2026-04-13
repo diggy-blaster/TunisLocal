@@ -1,6 +1,10 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { Inter, Noto_Sans_Arabic } from 'next/font/google';
 import '@/app/globals.css';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const notoArabic = Noto_Sans_Arabic({ subsets: ['arabic'], variable: '--font-arabic' });
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'fr' }, { locale: 'ar' }];
@@ -20,12 +24,12 @@ export default async function LocaleLayout({
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={locale} dir={dir} className={`${inter.variable} ${notoArabic.variable}`}>
       <body className="min-h-screen bg-gray-50 text-gray-900 font-sans">
         <NextIntlClientProvider messages={messages}>
           <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b px-6 py-4 flex justify-between items-center">
             <h1 className="text-xl font-bold tracking-tight">{t('title')}</h1>
-            <nav className="flex gap-4 text-sm font-medium">
+            <nav className={`flex gap-4 text-sm font-medium ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
               {['home', 'services', 'bookings', 'reviews'].map((key) => (
                 <a key={key} href={`/${locale}/${key}`} className="hover:text-blue-600 transition">
                   {t(`nav.${key}` as any)}

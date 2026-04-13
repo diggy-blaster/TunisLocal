@@ -20,7 +20,7 @@ export default function ReviewForm({
   const [errorMsg, setErrorMsg] = useState('');
 
   const schema = z.object({
-    rating: z.number().min(1).max(5),
+    rating: z.number().min(1, { message: t('ratingRequired') }).max(5),
     comment: z.string().min(10, { message: t('minCommentLength') || 'Comment too short' }).optional().or(z.literal('')),
   });
 
@@ -94,7 +94,7 @@ export default function ReviewForm({
       {/* Submit */}
       <button
         type="submit"
-        disabled={submitting || rating === 0}
+        disabled={submitting}
         className="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
       >
         {submitting ? <Loader2 className="animate-spin" /> : t('submit')}

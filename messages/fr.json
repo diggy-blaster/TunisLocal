@@ -4,6 +4,21 @@
     "nav": { "home": "Accueil", "services": "Services", "bookings": "Mes Réservations", "reviews": "Avis", "profile": "Profil" },
     "theme": { "light": "Clair", "dark": "Sombre" }
   },
+  "home": {
+    "hero": {
+      "title": "Des services locaux de confiance, livrés rapidement.",
+      "subtitle": "Trouvez des professionnels vérifiés à proximité, réservez instantanément et gérez vos rendez-vous au même endroit.",
+      "cta": "Parcourir les services",
+      "secondary": "Comment ça marche"
+    },
+    "categories": {
+      "title": "Catégories populaires",
+      "cleaning": "Ménage",
+      "plumbing": "Plomberie",
+      "electric": "Électricité",
+      "moving": "Déménagement"
+    }
+  },
   "services": {
     "title": "Services à proximité",
     "searchPlaceholder": "Rechercher par nom ou catégorie...",
@@ -14,13 +29,23 @@
     "viewDetails": "Voir les détails",
     "bookNow": "Réserver"
   },
+  "service": {
+    "tabs": { "info": "Infos", "reviews": "Avis" },
+    "description": "Notre équipe de plomberie experte assure des réparations rapides et fiables pour les maisons et commerces de Tunis.",
+    "bookNow": "Réserver",
+    "contact": "Contact"
+  },
   "reviews": {
     "title": "Avis Clients",
     "writeReview": "Laisser un avis",
     "rating": "Note",
     "comment": "Commentaire",
+    "commentPlaceholder": "Partagez votre expérience...",
     "submit": "Publier l'avis",
+    "submitFailed": "Impossible d'envoyer l'avis. Veuillez réessayer.",
     "required": "Requis",
+    "ratingRequired": "La note est requise",
+    "minCommentLength": "Le commentaire doit contenir au moins 10 caractères",
     "success": "Avis envoyé avec succès !",
     "alreadyReviewed": "Vous avez déjà évalué cette réservation."
   },
@@ -47,5 +72,29 @@
   "serviceCard": {
     "distance": "À {dist} km",
     "rating": "{rating} ({count} avis)"
+  },
+  "booking": {
+    "title": "Réserver un Service",
+    "step1": { "title": "Planification & Détails", "date": "Date", "time": "Heure", "notes": "Notes supplémentaires", "next": "Continuer" },
+    "step2": { "title": "Méthode de Paiement", "select": "Choisissez votre méthode de paiement", "next": "Vérifier" },
+    "step3": { "title": "Confirmer la Réservation", "summary": "Récapitulatif", "total": "Total", "confirm": "Confirmer & Payer", "back": "Retour" },
+    "providers": { "flouci": "Portefeuille Flouci", "d17": "D17", "cash": "Espèces sur place", "online_bank": "Paiement en ligne" },
+    "success": "Réservation créée avec succès ! Redirection vers le paiement...",
+    "error": "Échec de la création de la réservation. Veuillez réessayer.",
+    "validation": { "dateRequired": "La date est requise", "timeRequired": "L'heure est requise", "providerRequired": "La méthode de paiement est requise" }
+  },
+  "admin": {
+    "nav": { "payments": "Paiements", "users": "Utilisateurs", "settings": "Paramètres" },
+    "payments": {
+      "title": "Tableau de bord des paiements",
+      "metrics": { "total": "Paiements totaux", "succeeded": "Réussis", "pending": "En attente", "failed": "Échoués", "revenue": "Revenu total" },
+      "filters": { "status": "Statut", "provider": "Fournisseur", "dateFrom": "De", "dateTo": "À", "search": "Rechercher ID, utilisateur ou email..." },
+      "table": { "id": "ID de paiement", "booking": "Réservation", "customer": "Client", "service": "Service", "provider": "Fournisseur", "amount": "Montant", "status": "Statut", "date": "Créé", "actions": "Actions" },
+      "statuses": { "pending": "En attente", "succeeded": "Réussi", "failed": "Échoué", "refunded": "Remboursé", "expired": "Expiré" },
+      "providers": { "flouci": "Flouci", "d17": "D17", "online_bank": "Virement bancaire", "cash": "Espèces sur place" },
+      "pagination": { "prev": "Précédent", "next": "Suivant", "showing": "Affichage de {from}-{to} sur {total}" },
+      "loading": "Chargement des paiements...",
+      "noResults": "Aucun paiement ne correspond à vos filtres."
+    }
   }
 }

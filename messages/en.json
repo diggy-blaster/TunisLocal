@@ -4,6 +4,21 @@
     "nav": { "home": "Home", "services": "Services", "bookings": "My Bookings", "reviews": "Reviews", "profile": "Profile" },
     "theme": { "light": "Light", "dark": "Dark" }
   },
+  "home": {
+    "hero": {
+      "title": "Trusted local services, delivered fast.",
+      "subtitle": "Find vetted professionals nearby, book instantly, and manage your appointments in one place.",
+      "cta": "Browse Services",
+      "secondary": "How It Works"
+    },
+    "categories": {
+      "title": "Popular categories",
+      "cleaning": "Cleaning",
+      "plumbing": "Plumbing",
+      "electric": "Electric",
+      "moving": "Moving"
+    }
+  },
   "services": {
     "title": "Find Nearby Services",
     "searchPlaceholder": "Search by name or category...",
@@ -14,13 +29,23 @@
     "viewDetails": "View Details",
     "bookNow": "Book Now"
   },
+  "service": {
+    "tabs": { "info": "Info", "reviews": "Reviews" },
+    "description": "Our expert plumbing team delivers fast, reliable repairs for homes and businesses across Tunis.",
+    "bookNow": "Book Now",
+    "contact": "Contact"
+  },
   "reviews": {
     "title": "Customer Reviews",
     "writeReview": "Write a Review",
     "rating": "Rating",
     "comment": "Comment",
+    "commentPlaceholder": "Share your experience...",
     "submit": "Submit Review",
+    "submitFailed": "Unable to submit review. Please try again.",
     "required": "Required",
+    "ratingRequired": "Rating is required",
+    "minCommentLength": "Comment must be at least 10 characters",
     "success": "Review submitted successfully!",
     "alreadyReviewed": "You have already reviewed this booking."
   },
@@ -47,5 +72,29 @@
   "serviceCard": {
     "distance": "{dist} km away",
     "rating": "{rating} ({count} reviews)"
+  },
+  "booking": {
+    "title": "Book Service",
+    "step1": { "title": "Schedule & Details", "date": "Date", "time": "Time", "notes": "Additional Notes", "next": "Continue" },
+    "step2": { "title": "Payment Method", "select": "Choose how you want to pay", "next": "Review" },
+    "step3": { "title": "Confirm Booking", "summary": "Booking Summary", "total": "Total", "confirm": "Confirm & Pay", "back": "Back" },
+    "providers": { "flouci": "Flouci Wallet", "d17": "D17", "cash": "Cash on Site", "online_bank": "Online Banking" },
+    "success": "Booking created successfully! Redirecting to payment...",
+    "error": "Failed to create booking. Please try again.",
+    "validation": { "dateRequired": "Date is required", "timeRequired": "Time is required", "providerRequired": "Payment method is required" }
+  },
+  "admin": {
+    "nav": { "payments": "Payments", "users": "Users", "settings": "Settings" },
+    "payments": {
+      "title": "Payment Dashboard",
+      "metrics": { "total": "Total Payments", "succeeded": "Succeeded", "pending": "Pending", "failed": "Failed", "revenue": "Total Revenue" },
+      "filters": { "status": "Status", "provider": "Provider", "dateFrom": "From", "dateTo": "To", "search": "Search ID, user, or email..." },
+      "table": { "id": "Payment ID", "booking": "Booking", "customer": "Customer", "service": "Service", "provider": "Provider", "amount": "Amount", "status": "Status", "date": "Created", "actions": "Actions" },
+      "statuses": { "pending": "Pending", "succeeded": "Succeeded", "failed": "Failed", "refunded": "Refunded", "expired": "Expired" },
+      "providers": { "flouci": "Flouci", "d17": "D17", "online_bank": "Bank Transfer", "cash": "Cash on Site" },
+      "pagination": { "prev": "Previous", "next": "Next", "showing": "Showing {from}-{to} of {total}" },
+      "loading": "Loading payments...",
+      "noResults": "No payments match your filters."
+    }
   }
 }

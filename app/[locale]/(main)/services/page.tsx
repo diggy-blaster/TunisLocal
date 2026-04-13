@@ -1,5 +1,6 @@
 'use client';
 
+import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
@@ -33,7 +34,7 @@ export default function ServicesPage() {
     try {
       const res  = await fetch(`/api/services/nearby?lat=${lat}&lng=${lng}&radius=${radius}`);
       const data = await res.json();
-      setServices(data.rows || []);
+      setServices(Array.isArray(data) ? data : data.rows || []);
     } catch {
       setServices([]);
     } finally {
@@ -92,7 +93,7 @@ export default function ServicesPage() {
             <span className="text-sm w-12 text-center">{radius} km</span>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+        <div className="flex-1 overflow-y-auto space-y-3 pe-1">
           {loading && <p className="text-gray-500 animate-pulse">{t('services.loading')}</p>}
           {!loading && services.length === 0 && userPos &&
             <p className="text-gray-500">{t('services.noResults')}</p>}

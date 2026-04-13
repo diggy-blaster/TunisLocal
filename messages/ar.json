@@ -4,6 +4,21 @@
     "nav": { "home": "الرئيسية", "services": "الخدمات", "bookings": "حجوزاتي", "reviews": "التقييمات", "profile": "الملف الشخصي" },
     "theme": { "light": "فاتح", "dark": "داكن" }
   },
+  "home": {
+    "hero": {
+      "title": "خدمات محلية موثوقة، سريعة ومحترفة.",
+      "subtitle": "ابحث عن محترفين معتمدين بالقرب منك، احجز فوراً، وادِر مواعيدك في مكان واحد.",
+      "cta": "تصفح الخدمات",
+      "secondary": "كيف يعمل"
+    },
+    "categories": {
+      "title": "الفئات الشائعة",
+      "cleaning": "تنظيف",
+      "plumbing": "سباكة",
+      "electric": "كهرباء",
+      "moving": "نقل"
+    }
+  },
   "services": {
     "title": "الخدمات القريبة منك",
     "searchPlaceholder": "ابحث بالاسم أو الفئة...",
@@ -14,13 +29,23 @@
     "viewDetails": "عرض التفاصيل",
     "bookNow": "احجز الآن"
   },
+  "service": {
+    "tabs": { "info": "معلومات", "reviews": "التقييمات" },
+    "description": "فريق السباكة المحترف لدينا يقدم إصلاحات سريعة وموثوقة للمنازل والشركات في تونس.",
+    "bookNow": "احجز الآن",
+    "contact": "اتصل"
+  },
   "reviews": {
     "title": "آراء العملاء",
     "writeReview": "أضف تقييمك",
     "rating": "التقييم",
     "comment": "التعليق",
+    "commentPlaceholder": "شارك تجربتك...",
     "submit": "إرسال التقييم",
+    "submitFailed": "تعذر إرسال التقييم. يرجى المحاولة مرة أخرى.",
     "required": "مطلوب",
+    "ratingRequired": "التقييم مطلوب",
+    "minCommentLength": "يجب أن يكون التعليق 10 أحرف على الأقل",
     "success": "تم إرسال التقييم بنجاح!",
     "alreadyReviewed": "لقد قمت بتقييم هذا الحجز مسبقاً."
   },
@@ -47,5 +72,29 @@
   "serviceCard": {
     "distance": "على بعد {dist} كم",
     "rating": "{rating} ({count} تقييم)"
+  },
+  "booking": {
+    "title": "حجز خدمة",
+    "step1": { "title": "الجدولة والتفاصيل", "date": "التاريخ", "time": "الوقت", "notes": "ملاحظات إضافية", "next": "استمرار" },
+    "step2": { "title": "طريقة الدفع", "select": "اختر طريقة الدفع", "next": "مراجعة" },
+    "step3": { "title": "تأكيد الحجز", "summary": "ملخص الحجز", "total": "الإجمالي", "confirm": "تأكيد والدفع", "back": "عودة" },
+    "providers": { "flouci": "محفظة Flouci", "d17": "D17", "cash": "نقداً عند الوصول", "online_bank": "الخدمة المصرفية عبر الإنترنت" },
+    "success": "تم إنشاء الحجز بنجاح! جاري التحويل إلى الدفع...",
+    "error": "فشل إنشاء الحجز. يرجى المحاولة مرة أخرى.",
+    "validation": { "dateRequired": "التاريخ مطلوب", "timeRequired": "الوقت مطلوب", "providerRequired": "طريقة الدفع مطلوبة" }
+  },
+  "admin": {
+    "nav": { "payments": "المدفوعات", "users": "المستخدمين", "settings": "الإعدادات" },
+    "payments": {
+      "title": "لوحة تحكم المدفوعات",
+      "metrics": { "total": "إجمالي المدفوعات", "succeeded": "ناجحة", "pending": "قيد الانتظار", "failed": "فاشلة", "revenue": "إجمالي العائدات" },
+      "filters": { "status": "الحالة", "provider": "المزود", "dateFrom": "من", "dateTo": "إلى", "search": "ابحث بالمعرّف، المستخدم، أو البريد..." },
+      "table": { "id": "معرّف الدفع", "booking": "الحجز", "customer": "العميل", "service": "الخدمة", "provider": "المزود", "amount": "المبلغ", "status": "الحالة", "date": "تاريخ الإنشاء", "actions": "الإجراءات" },
+      "statuses": { "pending": "قيد الانتظار", "succeeded": "ناجحة", "failed": "فاشلة", "refunded": "تمت إعادتها", "expired": "منتهية" },
+      "providers": { "flouci": "فلووچي", "d17": "D17", "online_bank": "تحويل بنكي", "cash": "نقداً عند الوصول" },
+      "pagination": { "prev": "السابق", "next": "التالي", "showing": "عرض {from}-{to} من {total}" },
+      "loading": "جاري تحميل المدفوعات...",
+      "noResults": "لا توجد مدفوعات تطابق عوامل التصفية."
+    }
   }
 }

@@ -1,22 +1,39 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 
 export default function HomePage() {
-  const t = useTranslations('layout');
+  const t = useTranslations('home');
+  const locale = useLocale();
+
   return (
-    <div className="space-y-8 text-center py-12">
-      <h2 className="text-4xl font-extrabold">{t('title')}</h2>
-      <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-        Find trusted local services, book instantly, and pay securely. Available in your language.
-      </p>
-      <div className="flex justify-center gap-4">
-        <Link href="/services" className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          {t('nav.services')}
-        </Link>
-        <Link href="/bookings" className="px-6 py-3 border rounded-lg hover:bg-gray-100 transition">
-          {t('nav.bookings')}
-        </Link>
-      </div>
+    <div className="space-y-16 py-12">
+      <section className="text-center max-w-3xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{t('hero.title')}</h1>
+        <p className="text-lg text-[var(--muted)] mb-8">{t('hero.subtitle')}</p>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href={`/${locale}/services`} className="btn-primary px-8 py-3 text-base">
+            {t('hero.cta')}
+          </Link>
+          <Link
+            href={`/${locale}/how-it-works`}
+            className="px-8 py-3 border border-[var(--border)] rounded-lg hover:bg-[var(--bg-secondary)] transition"
+          >
+            {t('hero.secondary')}
+          </Link>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('categories.title')}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {['cleaning', 'plumbing', 'electric', 'moving'].map((cat) => (
+            <div key={cat} className="card p-6 text-center hover:border-[var(--accent)] cursor-pointer">
+              <div className="text-3xl mb-2">🛠️</div>
+              <p className="font-medium">{t(`categories.${cat}`)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
