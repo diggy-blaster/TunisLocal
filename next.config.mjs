@@ -1,12 +1,11 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  // ✅ Next.js ≥ 14.1: top-level key (not in experimental), no built-ins like 'crypto'
   serverExternalPackages: ['pg', 'expo-server-sdk'],
-
-  // ✅ No i18n block — use next-intl middleware instead for App Router
-
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -16,8 +15,6 @@ const nextConfig = {
         tls: false,
       };
     }
-
-    // ✅ Safe pg-native exclusion regardless of externals shape
     if (Array.isArray(config.externals)) {
       config.externals.push('pg-native');
     } else {
@@ -27,32 +24,17 @@ const nextConfig = {
         return [...(Array.isArray(base) ? base : []), 'pg-native'];
       };
     }
-
     return config;
   },
-
-  // ✅ Remove output: 'standalone' for Vercel — only use for Docker/self-hosted
-  
   compress: true,
   poweredByHeader: false,
-
-  // ✅ remotePatterns only, no deprecated domains[]
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.tile.openstreetmap.org',
-      },
-      {
-        protocol: 'https',
-        hostname: 'unpkg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.vercel.app',
-      },
+      { protocol: 'https', hostname: '**.tile.openstreetmap.org' },
+      { protocol: 'https', hostname: 'unpkg.com' },
+      { protocol: 'https', hostname: '**.vercel.app' },
     ],
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
