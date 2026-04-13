@@ -14,6 +14,8 @@ type BookingFormValues = {
   payment_provider: 'flouci' | 'd17' | 'cash' | 'online_bank';
 };
 
+const PROVIDERS = ['flouci', 'd17', 'cash', 'online_bank'] as const;
+
 export default function BookingWizard({
   serviceId,
   providerId,
@@ -29,31 +31,37 @@ export default function BookingWizard({
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // lib/types.ts
-export const PAYMENT_PROVIDERS = ['flouci', 'd17', 'cash', 'online_bank'] as const;
-export type PaymentProvider = typeof PAYMENT_PROVIDERS[number];
+  // ✅ Fixed Zod schema: removed invalid `required_error`, used `.refine()` for custom message
+  const schema = z.object({
+    scheduled_date: z.string().min(1, t('validation.dateRequired')),
+    scheduled_time: z.string().min(1, t('validation.timeRequired')),
+    notes: z.string().optional(),
+    payment_provider: z.enum(PROVIDERS),
+  }).refine((data) => data.payment_provider, {
+    message: t('validation.providerRequired'),
+    path: ['payment_provider'],
+  });
 
-// In BookingWizard.tsx
-import { PAYMENT_PROVIDERS, PaymentProvider } from '@/lib/types';
-
-const schema = z.object({
-  // ...
-  payment_provider: z.enum(PAYMENT_PROVIDERS),
-}).refine((data) => data.payment_provider, {
-  message: t('validation.providerRequired'),
-  path: ['payment_provider'],
-});
-
-  const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<BookingFormValues>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<BookingFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { notes: '' },
+    defaultValues: {
+      scheduled_date: '',
+      scheduled_time: '',
+      notes: '',
+      payment_provider: undefined as any,
+    },
   });
 
   const selectedProvider = watch('payment_provider');
+  const watchedDate = watch('scheduled_date');
+  const watchedTime = watch('scheduled_time');
 
   const onSubmit = async (data: BookingFormValues) => {
     setLoading(true);
+    setStatus('idle');
+    setErrorMsg('');
     try {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -71,18 +79,19 @@ const schema = z.object({
       if (!res.ok) throw new Error(result.error || t('error'));
 
       setStatus('success');
-      // If online payment, redirect to gateway_link from response
-      if (result.payment?.gateway_link) {
+      // Redirect to payment gateway (skip for cash)
+      if (result.payment?.gateway_link && data.payment_provider !== 'cash') {
         window.location.href = result.payment.gateway_link;
       }
     } catch (err: any) {
       setStatus('error');
+      setErrorMsg(err.message || t('error'));
     } finally {
       setLoading(false);
     }
   };
 
-  const canProceedStep1 = watch('scheduled_date') && watch('scheduled_time') && !errors.scheduled_date && !errors.scheduled_time;
+  const canProceedStep1 = watchedDate && watchedTime && !errors.scheduled_date && !errors.scheduled_time;
   const canProceedStep2 = selectedProvider && !errors.payment_provider;
 
   if (status === 'success') {
@@ -97,10 +106,11 @@ const schema = z.object({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-white border border-[var(--border)] rounded-xl p-6 space-y-6 max-w-2xl">
+      {/* Progress Indicator */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold">{t('title')}</h2>
         <div className="flex gap-2 text-sm font-medium text-[var(--muted)]">
-          {[1, 2, 3].map(s => (
+          {[1, 2, 3].map((s) => (
             <div key={s} className={`w-8 h-8 rounded-full flex items-center justify-center transition ${step === s ? 'bg-[var(--accent)] text-white' : step > s ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
               {step > s ? <CheckCircle size={16} /> : s}
             </div>
@@ -112,7 +122,7 @@ const schema = z.object({
       {step === 1 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('step1.title')}</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">{t('step1.date')}</label>
               <div className="relative">
@@ -132,7 +142,7 @@ const schema = z.object({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">{t('step1.notes')}</label>
-            <textarea {...register('notes')} className="input" rows={3} placeholder={t('step1.notes')} />
+            <textarea {...register('notes')} className="input" rows={3} placeholder={t('step1.notes') || 'Additional notes...'} />
           </div>
           <button type="button" onClick={() => canProceedStep1 && setStep(2)} disabled={!canProceedStep1} className="btn-primary w-full">
             {t('step1.next')}
@@ -140,17 +150,17 @@ const schema = z.object({
         </div>
       )}
 
-      {/* Step 2: Payment */}
+      {/* Step 2: Payment Method */}
       {step === 2 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('step2.title')}</h3>
           <p className="text-sm text-[var(--muted)]">{t('step2.select')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(['flouci', 'd17', 'cash', 'online_bank'] as const).map(p => (
+            {PROVIDERS.map((p) => (
               <button
                 key={p}
                 type="button"
-                onClick={() => register('payment_provider').onChange({ target: { value: p } })}
+                onClick={() => setValue('payment_provider', p, { shouldValidate: true })}
                 className={`p-4 border rounded-lg text-start flex items-center gap-3 transition ${selectedProvider === p ? 'border-[var(--accent)] bg-[var(--accent)]/5 ring-1 ring-[var(--accent)]' : 'hover:border-[var(--accent)]'}`}
               >
                 {p === 'flouci' && <Wallet size={20} />}
@@ -163,7 +173,9 @@ const schema = z.object({
           </div>
           {errors.payment_provider && <p className="text-red-500 text-sm">{errors.payment_provider.message}</p>}
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-2 border rounded-lg hover:bg-gray-50 transition">{t('step3.back')}</button>
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-2 border rounded-lg hover:bg-[var(--bg-secondary)] transition">
+              {t('step3.back')}
+            </button>
             <button type="button" onClick={() => canProceedStep2 && setStep(3)} disabled={!canProceedStep2} className="btn-primary flex-1">
               {t('step2.next')}
             </button>
@@ -171,21 +183,29 @@ const schema = z.object({
         </div>
       )}
 
-      {/* Step 3: Summary */}
+      {/* Step 3: Summary & Confirm */}
       {step === 3 && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">{t('step3.summary')}</h3>
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span>{t('step1.date')}</span><span className="font-medium">{watch('scheduled_date')}</span></div>
-            <div className="flex justify-between"><span>{t('step1.time')}</span><span className="font-medium">{watch('scheduled_time')}</span></div>
+          <h3 className="font-semibold text-lg">{t('step3.title')}</h3>
+          <div className="bg-[var(--bg-secondary)] rounded-lg p-4 space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('step1.date')}</span><span className="font-medium">{watchedDate}</span></div>
+            <div className="flex justify-between"><span>{t('step1.time')}</span><span className="font-medium">{watchedTime}</span></div>
             <div className="flex justify-between"><span>{t('step2.title')}</span><span className="font-medium">{t(`providers.${selectedProvider}`)}</span></div>
-            <div className="border-t pt-2 mt-2 flex justify-between text-base font-bold">
+            {watch('notes') && (
+              <div className="border-t border-[var(--border)] pt-2 mt-2">
+                <span className="text-[var(--muted)]">{t('step1.notes')}</span>
+                <p className="mt-1">{watch('notes')}</p>
+              </div>
+            )}
+            <div className="border-t border-[var(--border)] pt-2 mt-2 flex justify-between text-base font-bold">
               <span>{t('step3.total')}</span>
-              <span className="text-[var(--accent)]">{price} TND</span>
+              <span className="text-[var(--accent)]">{price.toFixed(2)} TND</span>
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-2 border rounded-lg hover:bg-gray-50 transition">{t('step3.back')}</button>
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-2 border rounded-lg hover:bg-[var(--bg-secondary)] transition">
+              {t('step3.back')}
+            </button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2">
               {loading ? <Loader2 className="animate-spin" /> : <><CheckCircle size={16} /> {t('step3.confirm')}</>}
             </button>
@@ -195,7 +215,7 @@ const schema = z.object({
 
       {status === 'error' && (
         <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
-          <AlertCircle size={16} /> {t('error')}
+          <AlertCircle size={16} /> {errorMsg}
         </div>
       )}
     </form>

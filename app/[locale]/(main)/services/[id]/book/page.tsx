@@ -2,9 +2,12 @@ import { notFound } from 'next/navigation';
 import { pool } from '@/lib/db';
 import BookingWizard from '@/components/BookingWizard';
 
+// ✅ Next.js 15: params is a Promise, so component must be async
 export default async function BookPage({ params }: { params: Promise<{ id: string }> }) {
+  // ✅ Await the params Promise
   const { id } = await params;
 
+  // Fetch service details from DB
   const { rows } = await pool.query(
     `SELECT s.id, s.title, s.price, s.provider_id FROM services s WHERE s.id = $1`,
     [id]

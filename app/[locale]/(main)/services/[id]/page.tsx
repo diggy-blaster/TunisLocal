@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl';
 import ReviewForm from '@/components/forms/ReviewForm';
 import { Star, MapPin, Clock, Phone } from 'lucide-react';
 
-export default function ServiceDetail({ params }: { params: { id: string } }) {
+export default async function ServiceDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const t = useTranslations('service');
   const [activeTab, setActiveTab] = useState<'info' | 'reviews'>('info');
 
