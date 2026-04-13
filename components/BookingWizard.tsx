@@ -30,14 +30,22 @@ export default function BookingWizard({
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const schema = z.object({
-    scheduled_date: z.string().min(1, t('validation.dateRequired')),
-    scheduled_time: z.string().min(1, t('validation.timeRequired')),
-    notes: z.string().optional(),
-    payment_provider: z.enum(['flouci', 'd17', 'cash', 'online_bank'], { required_error: t('validation.providerRequired') }),
-  });
+  // lib/types.ts
+export const PAYMENT_PROVIDERS = ['flouci', 'd17', 'cash', 'online_bank'] as const;
+export type PaymentProvider = typeof PAYMENT_PROVIDERS[number];
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<BookingFormValues>({
+// In BookingWizard.tsx
+import { PAYMENT_PROVIDERS, PaymentProvider } from '@/lib/types';
+
+const schema = z.object({
+  // ...
+  payment_provider: z.enum(PAYMENT_PROVIDERS),
+}).refine((data) => data.payment_provider, {
+  message: t('validation.providerRequired'),
+  path: ['payment_provider'],
+});
+
+  const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<BookingFormValues>({
     resolver: zodResolver(schema),
     defaultValues: { notes: '' },
   });
@@ -63,6 +71,7 @@ export default function BookingWizard({
       if (!res.ok) throw new Error(result.error || t('error'));
 
       setStatus('success');
+      // If online payment, redirect to gateway_link from response
       if (result.payment?.gateway_link) {
         window.location.href = result.payment.gateway_link;
       }
@@ -91,7 +100,7 @@ export default function BookingWizard({
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold">{t('title')}</h2>
         <div className="flex gap-2 text-sm font-medium text-[var(--muted)]">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3].map(s => (
             <div key={s} className={`w-8 h-8 rounded-full flex items-center justify-center transition ${step === s ? 'bg-[var(--accent)] text-white' : step > s ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
               {step > s ? <CheckCircle size={16} /> : s}
             </div>
@@ -99,6 +108,7 @@ export default function BookingWizard({
         </div>
       </div>
 
+      {/* Step 1: Schedule */}
       {step === 1 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('step1.title')}</h3>
@@ -130,17 +140,19 @@ export default function BookingWizard({
         </div>
       )}
 
+      {/* Step 2: Payment */}
       {step === 2 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('step2.title')}</h3>
           <p className="text-sm text-[var(--muted)]">{t('step2.select')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(['flouci', 'd17', 'cash', 'online_bank'] as const).map((p) => (
+            {(['flouci', 'd17', 'cash', 'online_bank'] as const).map(p => (
               <button
                 key={p}
                 type="button"
                 onClick={() => register('payment_provider').onChange({ target: { value: p } })}
-                className={`p-4 border rounded-lg text-start flex items-center gap-3 transition ${selectedProvider === p ? 'border-[var(--accent)] bg-[var(--accent)]/5 ring-1 ring-[var(--accent)]' : 'hover:border-[var(--accent)]'}`}>
+                className={`p-4 border rounded-lg text-start flex items-center gap-3 transition ${selectedProvider === p ? 'border-[var(--accent)] bg-[var(--accent)]/5 ring-1 ring-[var(--accent)]' : 'hover:border-[var(--accent)]'}`}
+              >
                 {p === 'flouci' && <Wallet size={20} />}
                 {p === 'd17' && <CreditCard size={20} />}
                 {p === 'cash' && <Banknote size={20} />}
@@ -159,6 +171,7 @@ export default function BookingWizard({
         </div>
       )}
 
+      {/* Step 3: Summary */}
       {step === 3 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('step3.summary')}</h3>

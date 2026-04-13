@@ -2,10 +2,12 @@ import { notFound } from 'next/navigation';
 import { pool } from '@/lib/db';
 import BookingWizard from '@/components/BookingWizard';
 
-export default async function BookPage({ params }: { params: { id: string } }) {
+export default async function BookPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const { rows } = await pool.query(
     `SELECT s.id, s.title, s.price, s.provider_id FROM services s WHERE s.id = $1`,
-    [params.id]
+    [id]
   );
 
   if (rows.length === 0) notFound();
