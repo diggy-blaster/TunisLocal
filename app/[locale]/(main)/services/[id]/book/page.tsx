@@ -3,7 +3,11 @@ import { pool } from '@/lib/db';
 import BookingWizard from '@/components/BookingWizard';
 
 // ✅ Next.js 15: params is a Promise, so component must be async
-export default async function BookPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function BookPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
   // ✅ Await the params Promise
   const { id } = await params;
 
