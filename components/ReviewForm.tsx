@@ -7,13 +7,12 @@ import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { Star, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
-export default function ReviewForm({
-  bookingId,
-  onSuccess,
-}: {
+type ReviewFormProps = {
   bookingId: string;
   onSuccess?: () => void;
-}) {
+};
+
+export default function ReviewForm({ bookingId, onSuccess }: ReviewFormProps) {
   const t = useTranslations('reviews');
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<'success' | 'error' | null>(null);
@@ -40,6 +39,7 @@ export default function ReviewForm({
   const onSubmit = async (data: { rating: number; comment?: string }) => {
     setSubmitting(true);
     setStatus(null);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/reviews', {
         method: 'POST',
