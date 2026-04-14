@@ -1,8 +1,17 @@
 {
   "layout": {
     "title": "TunisLocal",
-    "nav": { "home": "Home", "services": "Services", "bookings": "My Bookings", "reviews": "Reviews", "profile": "Profile" },
-    "theme": { "light": "Light", "dark": "Dark" }
+    "nav": {
+      "home": "Home",
+      "services": "Services",
+      "bookings": "My Bookings",
+      "reviews": "Reviews",
+      "profile": "Profile"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "home": {
     "hero": {
@@ -31,9 +40,23 @@
   },
   "service": {
     "tabs": { "info": "Info", "reviews": "Reviews" },
-    "description": "Our expert plumbing team delivers fast, reliable repairs for homes and businesses across Tunis.",
+    "backToList": "Back to services",
+    "availableNow": "Available now",
+    "location": "Location",
+    "openInMaps": "Open in maps",
+    "about": "About this service",
     "bookNow": "Book Now",
-    "contact": "Contact"
+    "contact": "Contact",
+    "responseTime": "Typically responds within 1 hour",
+    "verifiedProvider": "Verified provider",
+    "servesArea": "Serves your area",
+    "reviews": {
+      "title": "Customer Reviews",
+      "total": "reviews",
+      "noReviews": "No reviews yet. Be the first to share your experience!",
+      "prompt": "Used this service? Share your experience.",
+      "write": "Write a Review"
+    }
   },
   "reviews": {
     "title": "Customer Reviews",
@@ -45,7 +68,7 @@
     "submitFailed": "Unable to submit review. Please try again.",
     "required": "Required",
     "ratingRequired": "Rating is required",
-    "minCommentLength": "Comment must be at least 10 characters",
+    "commentMin": "Comment must be at least 10 characters",
     "success": "Review submitted successfully!",
     "alreadyReviewed": "You have already reviewed this booking."
   },
@@ -61,7 +84,7 @@
     "title": "Notifications",
     "empty": "No new notifications",
     "markRead": "Mark all as read"
- },
+  },
   "map": {
     "locateMe": "Use my location",
     "searchRadius": "Search radius (km)",
@@ -75,24 +98,90 @@
   },
   "booking": {
     "title": "Book Service",
-    "step1": { "title": "Schedule & Details", "date": "Date", "time": "Time", "notes": "Additional Notes", "next": "Continue" },
-    "step2": { "title": "Payment Method", "select": "Choose how you want to pay", "next": "Review" },
-    "step3": { "title": "Confirm Booking", "summary": "Booking Summary", "total": "Total", "confirm": "Confirm & Pay", "back": "Back" },
-    "providers": { "flouci": "Flouci Wallet", "d17": "D17", "cash": "Cash on Site", "online_bank": "Online Banking" },
+    "step1": {
+      "title": "Schedule & Details",
+      "date": "Date",
+      "time": "Time",
+      "notes": "Additional Notes",
+      "next": "Continue"
+    },
+    "step2": {
+      "title": "Payment Method",
+      "select": "Choose how you want to pay",
+      "next": "Review"
+    },
+    "step3": {
+      "title": "Confirm Booking",
+      "summary": "Booking Summary",
+      "total": "Total",
+      "confirm": "Confirm & Pay",
+      "back": "Back"
+    },
+    "providers": {
+      "flouci": "Flouci Wallet",
+      "d17": "D17",
+      "cash": "Cash on Site",
+      "online_bank": "Online Banking"
+    },
     "success": "Booking created successfully! Redirecting to payment...",
     "error": "Failed to create booking. Please try again.",
-    "validation": { "dateRequired": "Date is required", "timeRequired": "Time is required", "providerRequired": "Payment method is required" }
+    "validation": {
+      "dateRequired": "Date is required",
+      "timeRequired": "Time is required",
+      "providerRequired": "Payment method is required"
+    }
   },
   "admin": {
-    "nav": { "payments": "Payments", "users": "Users", "settings": "Settings" },
+    "nav": {
+      "payments": "Payments",
+      "users": "Users",
+      "settings": "Settings"
+    },
     "payments": {
       "title": "Payment Dashboard",
-      "metrics": { "total": "Total Payments", "succeeded": "Succeeded", "pending": "Pending", "failed": "Failed", "revenue": "Total Revenue" },
-      "filters": { "status": "Status", "provider": "Provider", "dateFrom": "From", "dateTo": "To", "search": "Search ID, user, or email..." },
-      "table": { "id": "Payment ID", "booking": "Booking", "customer": "Customer", "service": "Service", "provider": "Provider", "amount": "Amount", "status": "Status", "date": "Created", "actions": "Actions" },
-      "statuses": { "pending": "Pending", "succeeded": "Succeeded", "failed": "Failed", "refunded": "Refunded", "expired": "Expired" },
-      "providers": { "flouci": "Flouci", "d17": "D17", "online_bank": "Bank Transfer", "cash": "Cash on Site" },
-      "pagination": { "prev": "Previous", "next": "Next", "showing": "Showing {from}-{to} of {total}" },
+      "metrics": {
+        "total": "Total Payments",
+        "succeeded": "Succeeded",
+        "pending": "Pending",
+        "failed": "Failed",
+        "revenue": "Total Revenue"
+      },
+      "filters": {
+        "status": "Status",
+        "provider": "Provider",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "search": "Search ID, user, or email..."
+      },
+      "table": {
+        "id": "Payment ID",
+        "booking": "Booking",
+        "customer": "Customer",
+        "service": "Service",
+        "provider": "Provider",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Created",
+        "actions": "Actions"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "succeeded": "Succeeded",
+        "failed": "Failed",
+        "refunded": "Refunded",
+        "expired": "Expired"
+      },
+      "providers": {
+        "flouci": "Flouci",
+        "d17": "D17",
+        "online_bank": "Bank Transfer",
+        "cash": "Cash on Site"
+      },
+      "pagination": {
+        "prev": "Previous",
+        "next": "Next",
+        "showing": "Showing {from}-{to} of {total}"
+      },
       "loading": "Loading payments...",
       "noResults": "No payments match your filters."
     }
