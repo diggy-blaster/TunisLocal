@@ -1,23 +1,24 @@
-// lib/db.ts
 import { Pool } from 'pg';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set');
-}
+const databaseUrl = process.env.DATABASE_URL;
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' 
-    ? { rejectUnauthorized: false } 
-    : false,
+  connectionString: databaseUrl,
+  ssl:
+    process.env.NODE_ENV === 'production' && databaseUrl
+      ? { rejectUnauthorized: false }
+      : false,
 });
 
-// Optional: Test connection on startup
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ Database connection error:', err.message);
-  } else {
+if (databaseUrl) {
+  pool.connect((err, client, release) => {
+    if (err) {
+      console.error('❌ Database connection error:', err.message);
+      return;
+    }
     console.log('✅ Database connected');
     release();
-  }
-});
+  });
+} else {
+  console.warn('⚠️ DATABASE_URL is not set. DB-backed routes will fail until it is configured.');
+}
