@@ -1,35 +1,38 @@
-import { NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 import { getToken } from 'next-auth/jwt';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+const intlMiddleware = createMiddleware({
+  locales: ['en', 'fr', 'ar'],
+  defaultLocale: 'en',
+  localeDetection: true,
+});
 
-  // Check if the path includes '/admin' (catches /en/admin, /fr/admin, etc.)
-  if (pathname.includes('/admin')) {
-    // Securely retrieve the session token
-    const token = await getToken({ 
-      req, 
-      secret: process.env.NEXTAUTH_SECRET 
+export async function middleware(req) {
+  const url = req.nextUrl.clone();
+  const pathname = url.pathname;
+
+  const localeMatch = pathname.match(/^\/(en|fr|ar)(\/|$)/);
+  const normalizedPath = localeMatch
+    ? pathname.replace(new RegExp(`^/${localeMatch[1]}`), '')
+    : pathname;
+
+  if (normalizedPath.startsWith('/admin')) {
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
     });
 
-    // If no token, redirect to login
-    if (!token) {
-      const loginUrl = new URL('/en/login', req.url);
-      loginUrl.searchParams.set('callbackUrl', req.url);
-      return NextResponse.redirect(loginUrl);
+    if (!token || token.role !== 'admin') {
+      const redirectUrl = req.nextUrl.clone();
+      redirectUrl.pathname = '/en/login';
+      return NextResponse.redirect(redirectUrl);
     }
-
-    // OPTIONAL: If you have an admin role, uncomment the next 4 lines:
-    // if (token.role !== 'admin') {
-    //   return NextResponse.redirect(new URL('/en/unauthorized', req.url));
-    // }
   }
 
-  return NextResponse.next();
+  return intlMiddleware(req);
 }
 
-// Apply middleware to all paths except static files and API routes (unless specified)
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
+  matcher: ['/((?!api|_next|.*\\..*).*)'],
 };
