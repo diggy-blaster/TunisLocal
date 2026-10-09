@@ -1,26 +1,35 @@
-import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import type { NextRequest } from 'next/server';
 
-const intlMiddleware = createMiddleware({
-  locales: ['en', 'fr', 'ar'],
-  defaultLocale: 'en',
-  localeDetection: true,
-});
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-export default function middleware(req) {
-  const intlResponse = intlMiddleware(req);
-  const url = req.nextUrl.clone();
+  // Check if the path includes '/admin' (catches /en/admin, /fr/admin, etc.)
+  if (pathname.includes('/admin')) {
+    // Securely retrieve the session token
+    const token = await getToken({ 
+      req, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
 
-  // 🔒 Simple admin guard (extend with NextAuth session verification in production)
-  if (url.pathname.startsWith('/admin')) {
-    const token = req.cookies.get('next-auth.session-token');
+    // If no token, redirect to login
     if (!token) {
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
+      const loginUrl = new URL('/en/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', req.url);
+      return NextResponse.redirect(loginUrl);
     }
+
+    // OPTIONAL: If you have an admin role, uncomment the next 4 lines:
+    // if (token.role !== 'admin') {
+    //   return NextResponse.redirect(new URL('/en/unauthorized', req.url));
+    // }
   }
 
-  return intlResponse;
+  return NextResponse.next();
 }
 
-export const config = { matcher: ['/((?!api|_next|.*\\..*).*)'] };
+// Apply middleware to all paths except static files and API routes (unless specified)
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
+};
