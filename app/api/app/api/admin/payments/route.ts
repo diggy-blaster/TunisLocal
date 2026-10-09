@@ -1,75 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { pool } from '@/lib/db';
+import createMiddleware from 'next-intl/middleware';
+import { getToken } from 'next-auth/jwt';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  // 1. Security Check: Ensure user is authenticated
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+const intlMiddleware = createMiddleware({
+  locales: ['en', 'fr', 'ar'],
+  defaultLocale: 'en',
+  localeDetection: true,
+});
 
-  // 2. Parse query parameters for filtering/pagination
-  const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get('page') || '1', 10);
-  const limit = parseInt(searchParams.get('limit') || '20', 10);
-  const status = searchParams.get('status');
-  const provider = searchParams.get('provider');
-  const search = searchParams.get('search');
+export async function middleware(req) {
+  const url = req.nextUrl.clone();
+  const pathname = url.pathname;
 
-  const offset = (page - 1) * limit;
+  const localeMatch = pathname.match(/^\/(en|fr|ar)(\/|$)/);
+  const normalizedPath = localeMatch
+    ? pathname.replace(new RegExp(`^/${localeMatch[1]}`), '')
+    : pathname;
 
-  // 3. Build dynamic query
-  let query = `
-    SELECT p.id, p.booking_id, p.amount_tnd, p.status, p.provider, p.initiated_at,
-           u.name AS customer_name, u.email AS customer_email,
-           s.title AS service_title
-    FROM payments p
-    JOIN bookings b ON p.booking_id = b.id
-    JOIN auth_users u ON b.customer_id = u.id
-    JOIN services s ON b.service_id = s.id
-    WHERE 1=1
-  `;
-  const params: any[] = [];
-  let paramIndex = 1;
-
-  if (status) {
-    query += ` AND p.status = $${paramIndex}`;
-    params.push(status);
-    paramIndex++;
-  }
-  if (provider) {
-    query += ` AND p.provider = $${paramIndex}`;
-    params.push(provider);
-    paramIndex++;
-  }
-  if (search) {
-    query += ` AND (u.name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex} OR s.title ILIKE $${paramIndex})`;
-    params.push(`%${search}%`);
-    paramIndex++;
-  }
-
-  query += ` ORDER BY p.initiated_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-  params.push(limit, offset);
-
-  try {
-    const { rows } = await pool.query(query, params);
-    
-    // Get total count for pagination
-    const countQuery = `SELECT COUNT(*) FROM payments`; // Simplified for now, can add WHERE clauses matching above
-    const { rows: countRows } = await pool.query(countQuery);
-    const total = parseInt(countRows[0].count, 10);
-
-    return NextResponse.json({
-      payments: rows,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+  if (normalizedPath.startsWith('/admin')) {
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
     });
-  } catch (error) {
-    console.error('Admin payments fetch error:', error);
-    return NextResponse.json({ error: 'Failed to fetch payments' }, { status: 500 });
+
+    if (!token || token.role !== 'admin') {
+      const redirectUrl = req.nextUrl.clone();
+      redirectUrl.pathname = '/en/login';
+      return NextResponse.redirect(redirectUrl);
+    }
   }
+
+  return intlMiddleware(req);
 }
+
+export const config = {
+  matcher: ['/((?!api|_next|.*\\..*).*)'],
+};
